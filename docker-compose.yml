@@ -1,0 +1,81 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - ./database/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=shulcloud
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - ./database/mongo:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=app_user
+      - MONGO_INITDB_ROOT_PASSWORD=app_password
+      - MONGO_INITDB_DATABASE=admin
+  fastapi:
+    container_name: fastapi
+    build:
+      context: ./fastapi
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --reload-dir ./app
+    environment:
+      PORT: 9000
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./fastapi/app:/code/app
+  django:
+    container_name: django
+    build:
+      context: ./django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./django:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
+    depends_on:
+      - postgres
+  nextjs:
+    container_name: nextjs
+    build:
+      context: ./nextjs
+    restart: always
+    volumes:
+      - ./nextjs/public:/app/public
+      - ./nextjs/src:/app/src
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+  rabbitmq:
+    image: bitnami/rabbitmq:latest
+    container_name: rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./database/redis/dаta:/root/redis
+      - ./database/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=my-password
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
