@@ -9,6 +9,9 @@ services:
       - POSTGRES_DB=shulcloud
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - devbox
+
   mongodb:
     image: mongo
     volumes:
@@ -19,6 +22,9 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=app_user
       - MONGO_INITDB_ROOT_PASSWORD=app_password
       - MONGO_INITDB_DATABASE=admin
+    networks:
+      - devbox
+
   fastapi:
     build:
       context: ./fastapi
@@ -29,6 +35,9 @@ services:
       - '9000:9000'
     volumes:
       - ./fastapi/app:/code/app
+    networks:
+      - devbox
+
   django:
     build:
       context: ./django
@@ -44,6 +53,9 @@ services:
       - POSTGRES_HOST=postgres
     depends_on:
       - postgres
+    networks:
+      - devbox
+
   nextjs:
     build:
       context: ./nextjs
@@ -55,11 +67,17 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
+    networks:
+      - devbox
+
   rabbitmq:
     image: bitnami/rabbitmq:latest
     ports:
         - 5672:5672
         - 15672:15672
+    networks:
+      - devbox
+
   redis:
     image: redis:latest
     restart: always
@@ -72,3 +90,9 @@ services:
       - REDIS_PASSWORD=my-password
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
+    networks:
+      - devbox
+
+networks:
+  devbox:
+    driver: bridge
