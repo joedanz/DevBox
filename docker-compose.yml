@@ -1,6 +1,5 @@
 services:
   postgres:
-    container_name: postgres
     image: postgres
     volumes:
       - ./database/postgres:/var/lib/postgresql/data
@@ -12,7 +11,6 @@ services:
       - POSTGRES_PASSWORD=postgres
   mongodb:
     image: mongo
-    container_name: mongodb
     volumes:
       - ./database/mongo:/data/db
     ports:
@@ -22,7 +20,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=app_password
       - MONGO_INITDB_DATABASE=admin
   fastapi:
-    container_name: fastapi
     build:
       context: ./fastapi
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --reload-dir ./app
@@ -33,7 +30,6 @@ services:
     volumes:
       - ./fastapi/app:/code/app
   django:
-    container_name: django
     build:
       context: ./django
     command: python manage.py runserver 0.0.0.0:8000
@@ -49,7 +45,6 @@ services:
     depends_on:
       - postgres
   nextjs:
-    container_name: nextjs
     build:
       context: ./nextjs
     restart: always
@@ -62,13 +57,11 @@ services:
       NODE_ENV: development
   rabbitmq:
     image: bitnami/rabbitmq:latest
-    container_name: rabbitmq
     ports:
         - 5672:5672
         - 15672:15672
   redis:
     image: redis:latest
-    container_name: redis
     restart: always
     ports:
       - "6379:6379"
