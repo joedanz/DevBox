@@ -16,6 +16,7 @@ services:
       - postgres
     networks:
       - devbox
+  
   fastapi:
     build:
       context: ./fastapi
@@ -26,6 +27,19 @@ services:
       - '9000:9000'
     volumes:
       - ./fastapi/app:/code/app
+    networks:
+      - devbox
+
+  flask:
+    build:
+      context: ./flask
+    restart: always
+    volumes:
+      - ./flask/app:/app
+    ports:
+      - "8500:8500"
+    environment:
+      NODE_ENV: development
     networks:
       - devbox
 
@@ -40,6 +54,21 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
+    networks:
+      - devbox
+
+  express:
+    build:
+      context: ./express
+    restart: always
+    volumes:
+     - ./:/code
+    ports:
+      - "8080:8080"
+      - "9229:9229"
+    environment:
+     - SERVER_PORT=8080
+    # - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/notes
     networks:
       - devbox
 
