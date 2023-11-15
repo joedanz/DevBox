@@ -158,6 +158,18 @@ services:
     networks:
       - devbox
 
+  nginx:
+    build:
+      context: ./nginx
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - NGINX_HOST=foobar.com
+      - NGINX_PORT=80
+    networks:
+      - devbox
+
 networks:
   devbox:
     driver: bridge
